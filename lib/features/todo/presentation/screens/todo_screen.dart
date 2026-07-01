@@ -284,10 +284,10 @@ class _TodoScreenState extends State<TodoScreen> {
                                           ),
                                         ),
                                       const SizedBox(height: 10),
-                                      // Bottom row: time + status badge
+                                     
                                       Row(
                                         children: [
-                                          // Clock icon + time
+                                        
                                           Icon(
                                             Icons.access_time,
                                             size: 14,
@@ -303,7 +303,7 @@ class _TodoScreenState extends State<TodoScreen> {
                                             ),
                                           ),
                                           const SizedBox(width: 12),
-                                          // Status badge
+                                        
                                           Container(
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 10,
@@ -330,7 +330,7 @@ class _TodoScreenState extends State<TodoScreen> {
                                               ),
                                             ),
                                           ),
-                                          // Sync pending indicator
+                                      
                                           if (todo.isSyncPending) ...[
                                             const SizedBox(width: 8),
                                             const Icon(Icons.cloud_off,

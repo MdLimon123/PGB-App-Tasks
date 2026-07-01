@@ -66,24 +66,24 @@ Future<void> onStart(ServiceInstance service) async {
 
   Timer.periodic(const Duration(minutes: 1), (timer) async {
     try {
-      // Check permissions first to avoid throwing exceptions constantly
+
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) return;
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-        return; // Don't try to get location if we don't have permission
+        return; 
       }
 
-      // Get current position with high accuracy
+  
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // Initialize Hive in background isolate if needed
+  
       await Hive.initFlutter();
 
-      // Open locations box if not already open
+   
       final Box locationsBox;
       if (Hive.isBoxOpen('locations')) {
         locationsBox = Hive.box('locations');
@@ -105,7 +105,7 @@ Future<void> onStart(ServiceInstance service) async {
           continue;
         }
 
-        // Calculate distance between current position and location
+   
         final distance = Geolocator.distanceBetween(
           position.latitude,
           position.longitude,
@@ -113,11 +113,11 @@ Future<void> onStart(ServiceInstance service) async {
           lng,
         );
 
-        // Check if currently inside geofence
+       
         final isInsideNow = distance < radiusM;
         final wasInsideBefore = _geofenceStates[locationId] ?? false;
 
-        // State transition: entering geofence
+    
         if (isInsideNow && !wasInsideBefore) {
           _geofenceStates[locationId] = true;
           await _showNotification(
@@ -128,7 +128,7 @@ Future<void> onStart(ServiceInstance service) async {
           );
         }
 
-        // State transition: leaving geofence
+     
         if (!isInsideNow && wasInsideBefore) {
           _geofenceStates[locationId] = false;
           await _showNotification(
@@ -139,7 +139,7 @@ Future<void> onStart(ServiceInstance service) async {
           );
         }
 
-        // Update state if changed
+   
         if (isInsideNow != wasInsideBefore) {
           _geofenceStates[locationId] = isInsideNow;
         }

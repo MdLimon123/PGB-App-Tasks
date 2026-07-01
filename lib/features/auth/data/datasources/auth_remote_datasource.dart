@@ -102,7 +102,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       await dioClient.dio.post(ApiConstants.logout);
     } catch (e) {
-      // Ignore logout error on server if network is down
+   
     }
     
     // Clear stored tokens

@@ -6,7 +6,7 @@ class DioClient {
   final Dio dio;
   final FlutterSecureStorage secureStorage;
   
-  // Prevent multiple token refresh attempts
+
   bool _isRefreshing = false;
 
   DioClient({required this.dio, required this.secureStorage}) {

@@ -101,7 +101,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                               boxShadow: [
                                 if (!isDark)
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.02),
+                                    color: Colors.black.withValues(alpha: 0.02),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
@@ -114,7 +114,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                                   height: 48,
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: theme.primaryColor.withOpacity(0.1),
+                                    color: theme.primaryColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: SvgPicture.asset(

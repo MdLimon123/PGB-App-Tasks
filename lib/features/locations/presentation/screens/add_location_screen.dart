@@ -7,7 +7,7 @@ import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
-import '../bloc/location_state.dart';
+
 
 class AddLocationScreen extends StatefulWidget {
   const AddLocationScreen({Key? key}) : super(key: key);
@@ -75,8 +75,8 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: theme.primaryColor.withOpacity(0.3), width: 2),
-                        color: theme.primaryColor.withOpacity(0.1),
+                        border: Border.all(color: theme.primaryColor.withValues(alpha: 0.3), width: 2),
+                        color: theme.primaryColor.withValues(alpha: 0.1),
                       ),
                     ),
                     // The location pin
@@ -144,7 +144,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                       }
                     }
                   } catch (_) {
-                    // Reverse geocoding failed, user can type name manually
+                    
                   }
                 } catch (e) {
                   if (context.mounted) {
@@ -219,7 +219,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
                 activeTrackColor: theme.primaryColor,
                 inactiveTrackColor: isDark ? Colors.white12 : Colors.grey.shade200,
                 thumbColor: theme.primaryColor,
-                overlayColor: theme.primaryColor.withOpacity(0.2),
+                overlayColor: theme.primaryColor.withValues(alpha: 0.2),
               ),
               child: Slider(
                 value: _radius,

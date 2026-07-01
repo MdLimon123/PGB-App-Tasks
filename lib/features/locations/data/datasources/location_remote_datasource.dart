@@ -37,8 +37,7 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
       }
     }
     
-    // If the API doesn't return the created object, just return the passed model.
-    // The BLoC will fetch the updated list anyway.
+   
     return location;
   }
 

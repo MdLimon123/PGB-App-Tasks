@@ -13,14 +13,14 @@ import 'features/auth/presentation/bloc/auth_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Hive
+
   await Hive.initFlutter();
   Hive.registerAdapter(TodoModelAdapter());
   
-  // Initialize Background Service
+
   await initializeBackgroundService();
   
-  // Initialize Dependency Injection
+
   await di.init();
   
   runApp(const FieldTrackApp());
