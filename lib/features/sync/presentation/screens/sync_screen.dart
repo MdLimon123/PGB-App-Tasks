@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../todo/presentation/bloc/todo_bloc.dart';
-import '../../todo/presentation/bloc/todo_state.dart';
-import '../../todo/presentation/bloc/todo_event.dart';
+import '../../../todo/presentation/bloc/todo_bloc.dart';
+import '../../../todo/presentation/bloc/todo_state.dart';
+import '../../../todo/presentation/bloc/todo_event.dart';
 
 class SyncScreen extends StatelessWidget {
   const SyncScreen({Key? key}) : super(key: key);

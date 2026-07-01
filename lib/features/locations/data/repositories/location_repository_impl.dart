@@ -35,8 +35,10 @@ class LocationRepositoryImpl implements LocationRepository {
       );
       final result = await remoteDataSource.addLocation(locationModel);
       return Right(result);
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.response?.data['message'] ?? 'Failed to add location'));
     } catch (e) {
-      return Left(ServerFailure('Failed to add location'));
+      return Left(ServerFailure('Failed to add location: $e'));
     }
   }
 

@@ -63,8 +63,10 @@ class TodoLocalDataSourceImpl implements TodoLocalDataSource {
         final syncedTodo = TodoModel(
           hiveId: todo.hiveId,
           hiveTitle: todo.hiveTitle,
+          hiveDescription: todo.hiveDescription,
           hiveIsCompleted: todo.hiveIsCompleted,
           hiveIsSyncPending: false,
+          hiveCreatedAt: todo.hiveCreatedAt,
         );
         await box.put(id, syncedTodo);
       }

@@ -1,6 +1,9 @@
 class ApiConstants {
   static const String baseUrl = 'https://todo.progressivebyte.com';
   
+  // Health
+  static const String health = '/health';
+  
   // Auth
   static const String register = '/api/v1/auth/register';
   static const String login = '/api/v1/auth/login';
@@ -10,8 +13,10 @@ class ApiConstants {
   
   // Locations
   static const String locations = '/api/v1/locations';
+  static String locationDetail(String id) => '/api/v1/locations/$id';
   
   // Todos
   static const String todos = '/api/v1/todos';
-  static const String syncTodos = '/api/v1/todos/sync';
+  static String todoDetail(String id) => '/api/v1/todos/$id';
+  static const String todoSync = '/api/v1/todos/sync';
 }

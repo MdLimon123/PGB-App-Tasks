@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
@@ -16,30 +17,18 @@ class _LocationsScreenState extends State<LocationsScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<LocationBloc>().add(GetLocationsEvent());
+    context.read<LocationBloc>().add(const LoadLocations());
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: theme.primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => BlocProvider.value(
-              value: context.read<LocationBloc>(),
-              child: const AddLocationScreen(),
-            )),
-          );
-        },
-      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -48,8 +37,11 @@ class _LocationsScreenState extends State<LocationsScreen> {
                 children: [
                   Text('Locations', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                   Container(
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(color: theme.primaryColor, borderRadius: BorderRadius.circular(12)),
                     child: IconButton(
+                      padding: EdgeInsets.zero,
                       icon: const Icon(Icons.add, color: Colors.white),
                       onPressed: () {
                         Navigator.push(
@@ -64,14 +56,24 @@ class _LocationsScreenState extends State<LocationsScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               TextField(
                 decoration: InputDecoration(
                   hintText: 'Search locations',
-                  prefixIcon: const Icon(Icons.search),
+                  hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.grey.shade500),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: SvgPicture.asset(
+                      'assets/icon/search.svg',
+                      width: 18,
+                      height: 18,
+                      colorFilter: ColorFilter.mode(isDark ? Colors.grey : Colors.grey.shade600, BlendMode.srcIn),
+                    ),
+                  ),
                   filled: true,
                   fillColor: theme.cardColor,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 16),
                 ),
               ),
               const SizedBox(height: 24),
@@ -84,7 +86,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                       return Center(child: Text(state.message, style: const TextStyle(color: Colors.red)));
                     } else if (state is LocationsLoaded) {
                       if (state.locations.isEmpty) {
-                        return const Center(child: Text('No locations found'));
+                        return Center(child: Text('No locations found', style: TextStyle(color: Colors.grey.shade500)));
                       }
                       return ListView.builder(
                         itemCount: state.locations.length,
@@ -96,16 +98,29 @@ class _LocationsScreenState extends State<LocationsScreen> {
                             decoration: BoxDecoration(
                               color: theme.cardColor,
                               borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                if (!isDark)
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.02),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                              ],
                             ),
                             child: Row(
                               children: [
                                 Container(
+                                  width: 48,
+                                  height: 48,
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     color: theme.primaryColor.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Icon(Icons.location_on, color: theme.primaryColor),
+                                  child: SvgPicture.asset(
+                                    'assets/icon/location.svg',
+                                    colorFilter: ColorFilter.mode(theme.primaryColor, BlendMode.srcIn),
+                                  ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
@@ -116,30 +131,37 @@ class _LocationsScreenState extends State<LocationsScreen> {
                                       const SizedBox(height: 4),
                                       Row(
                                         children: [
-                                          const Icon(Icons.my_location, size: 12, color: Colors.grey),
+                                          const Icon(Icons.my_location, size: 14, color: Colors.grey),
                                           const SizedBox(width: 4),
-                                          Text('${loc.latitude}, ${loc.longitude}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                                          Expanded(
+                                            child: Text(
+                                              '${loc.latitude}, ${loc.longitude}',
+                                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(height: 10),
                                       Row(
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                                            child: Text('${loc.radiusM.toInt()} m radius', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                                            decoration: BoxDecoration(color: isDark ? Colors.white10 : Colors.grey.shade100, borderRadius: BorderRadius.circular(6)),
+                                            child: Text('${loc.radiusM.toInt()} m radius', style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey.shade600, fontWeight: FontWeight.w500)),
                                           ),
                                           const SizedBox(width: 8),
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(color: loc.isActive ? theme.primaryColor.withOpacity(0.1) : Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                                            child: Text(loc.isActive ? 'Active' : 'Inactive', style: TextStyle(fontSize: 12, color: loc.isActive ? theme.primaryColor : Colors.grey, fontWeight: FontWeight.bold)),
+                                            decoration: BoxDecoration(color: loc.isActive ? theme.primaryColor.withOpacity(0.1) : (isDark ? Colors.white10 : Colors.grey.shade100), borderRadius: BorderRadius.circular(6)),
+                                            child: Text(loc.isActive ? 'Active' : 'Inactive', style: TextStyle(fontSize: 12, color: loc.isActive ? theme.primaryColor : (isDark ? Colors.white70 : Colors.grey.shade600), fontWeight: FontWeight.w600)),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
+                                const SizedBox(width: 8),
                                 const Icon(Icons.chevron_right, color: Colors.grey),
                               ],
                             ),

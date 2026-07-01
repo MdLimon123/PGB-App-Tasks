@@ -32,8 +32,8 @@ class TodoRemoteDataSourceImpl implements TodoRemoteDataSource {
   @override
   Future<void> syncTodos(List<Map<String, dynamic>> pendingUpdates) async {
     await dioClient.dio.post(
-      ApiConstants.syncTodos,
-      data: {'updates': pendingUpdates},
+      ApiConstants.todoSync,
+      data: {'changes': pendingUpdates},
     );
   }
 }

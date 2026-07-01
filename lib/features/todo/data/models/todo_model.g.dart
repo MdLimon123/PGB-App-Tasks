@@ -21,13 +21,15 @@ class TodoModelAdapter extends TypeAdapter<TodoModel> {
       hiveTitle: fields[1] as String,
       hiveIsCompleted: fields[2] as bool,
       hiveIsSyncPending: fields[3] as bool,
+      hiveDescription: fields[4] as String?,
+      hiveCreatedAt: (fields[5] as String?) ?? DateTime.now().toIso8601String(),
     );
   }
 
   @override
   void write(BinaryWriter writer, TodoModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.hiveId)
       ..writeByte(1)
@@ -35,7 +37,11 @@ class TodoModelAdapter extends TypeAdapter<TodoModel> {
       ..writeByte(2)
       ..write(obj.hiveIsCompleted)
       ..writeByte(3)
-      ..write(obj.hiveIsSyncPending);
+      ..write(obj.hiveIsSyncPending)
+      ..writeByte(4)
+      ..write(obj.hiveDescription)
+      ..writeByte(5)
+      ..write(obj.hiveCreatedAt);
   }
 
   @override

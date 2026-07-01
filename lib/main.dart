@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pgb_app_tasks/features/auth/presentation/bloc/auth_event.dart';
 import 'core/theme/app_theme.dart';
 import 'core/routing/app_router.dart';
 import 'core/services/background_location_service.dart';
@@ -32,7 +33,7 @@ class FieldTrackApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (_) => di.sl<AuthBloc>(),
+          create: (_) => di.sl<AuthBloc>()..add(const CheckAuthStatus()),
         ),
       ],
       child: MaterialApp.router(

@@ -28,7 +28,18 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
       ApiConstants.locations,
       data: location.toJson(),
     );
-    return LocationModel.fromJson(response.data['data']);
+    
+    if (response.data != null && response.data is Map<String, dynamic>) {
+      if (response.data['data'] != null) {
+        return LocationModel.fromJson(response.data['data']);
+      } else if (response.data['id'] != null || response.data['_id'] != null) {
+        return LocationModel.fromJson(response.data);
+      }
+    }
+    
+    // If the API doesn't return the created object, just return the passed model.
+    // The BLoC will fetch the updated list anyway.
+    return location;
   }
 
   @override

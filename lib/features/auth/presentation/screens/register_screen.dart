@@ -89,7 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (_formKey.currentState!.validate()) {
                             context.read<AuthBloc>().add(
                               RegisterEvent(
-                                name: _nameController.text,
+                                fullName: _nameController.text,
                                 email: _emailController.text,
                                 password: _passwordController.text,
                               ),

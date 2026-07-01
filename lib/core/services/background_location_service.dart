@@ -3,18 +3,19 @@ import 'dart:ui';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-// Note: In a real app, you would inject the LocationRepository here to get the saved locations from Hive/LocalDB.
-// For demonstration, we assume we fetch them or have a local copy.
+// Track which geofences we're currently inside
+final Map<String, bool> _geofenceStates = {};
 
 Future<void> initializeBackgroundService() async {
   final service = FlutterBackgroundService();
 
-  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  final channel = AndroidNotificationChannel(
     'geofence_channel',
     'Geofence Notifications',
     description: 'This channel is used for geofence entry notifications.',
-    importance: Importance.high,
+    importance: Importance.defaultImportance,
   );
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -51,35 +52,132 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 }
 
 @pragma('vm:entry-point')
-void onStart(ServiceInstance service) async {
+Future<void> onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
-  
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
 
-  // Request location permission here if needed
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings(),
+    ),
+  );
 
   Timer.periodic(const Duration(minutes: 1), (timer) async {
-    // 1. Get current position
     try {
-      Position position = await Geolocator.getCurrentPosition(
+      // Check permissions first to avoid throwing exceptions constantly
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        return; // Don't try to get location if we don't have permission
+      }
+
+      // Get current position with high accuracy
+      final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      
-      // 2. Fetch locations from Local DB (e.g. Hive)
-      // List<Location> locations = await localDataSource.getLocations();
-      
-      // Example static check for demonstration:
-      // double distance = Geolocator.distanceBetween(position.latitude, position.longitude, targetLat, targetLng);
-      // if (distance < targetRadius && !wasInsideBefore) {
-      //    triggerNotification(location.name);
-      // }
-      
-      print('Background location checked: \${position.latitude}, \${position.longitude}');
+
+      // Initialize Hive in background isolate if needed
+      await Hive.initFlutter();
+
+      // Open locations box if not already open
+      final Box locationsBox;
+      if (Hive.isBoxOpen('locations')) {
+        locationsBox = Hive.box('locations');
+      } else {
+        locationsBox = await Hive.openBox('locations');
+      }
+      final locationsList = locationsBox.values.toList();
+
+      // Check each location for geofence
+      for (final locationData in locationsList) {
+        final locationId = locationData['id'] as String?;
+        final locationName = locationData['name'] as String?;
+        final lat = locationData['latitude'] as double?;
+        final lng = locationData['longitude'] as double?;
+        final radiusM = (locationData['radius_m'] ?? locationData['radiusM']) as int? ?? 100;
+        final isActive = locationData['is_active'] as bool? ?? true;
+
+        if (locationId == null || lat == null || lng == null || !isActive) {
+          continue;
+        }
+
+        // Calculate distance between current position and location
+        final distance = Geolocator.distanceBetween(
+          position.latitude,
+          position.longitude,
+          lat,
+          lng,
+        );
+
+        // Check if currently inside geofence
+        final isInsideNow = distance < radiusM;
+        final wasInsideBefore = _geofenceStates[locationId] ?? false;
+
+        // State transition: entering geofence
+        if (isInsideNow && !wasInsideBefore) {
+          _geofenceStates[locationId] = true;
+          await _showNotification(
+            flutterLocalNotificationsPlugin,
+            'Entered: $locationName',
+            'You entered the geofence for $locationName (${distance.toStringAsFixed(0)}m away)',
+            locationId,
+          );
+        }
+
+        // State transition: leaving geofence
+        if (!isInsideNow && wasInsideBefore) {
+          _geofenceStates[locationId] = false;
+          await _showNotification(
+            flutterLocalNotificationsPlugin,
+            'Left: $locationName',
+            'You left the geofence for $locationName (${distance.toStringAsFixed(0)}m away)',
+            locationId,
+          );
+        }
+
+        // Update state if changed
+        if (isInsideNow != wasInsideBefore) {
+          _geofenceStates[locationId] = isInsideNow;
+        }
+      }
     } catch (e) {
-      print('Location error in background: \$e');
+      print('Location error in background: $e');
     }
   });
+}
+
+Future<void> _showNotification(
+  FlutterLocalNotificationsPlugin plugin,
+  String title,
+  String body,
+  String locationId,
+) async {
+  final notificationDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      'geofence_channel',
+      'Geofence Notifications',
+      channelDescription: 'Notifications for geofence entry and exit',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+      ticker: 'ticker',
+    ),
+    iOS: const DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    ),
+  );
+
+  await plugin.show(
+    locationId.hashCode,
+    title,
+    body,
+    notificationDetails,
+  );
 }
 
 void triggerNotification(String locationName, FlutterLocalNotificationsPlugin plugin) {

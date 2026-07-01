@@ -44,8 +44,10 @@ class TodoRepositoryImpl implements TodoRepository {
     final localModel = TodoModel(
       hiveId: todo.id,
       hiveTitle: todo.title,
+      hiveDescription: todo.description,
       hiveIsCompleted: todo.isCompleted,
       hiveIsSyncPending: !isOnline,
+      hiveCreatedAt: todo.createdAt,
     );
     await localDataSource.updateTodo(localModel);
 
@@ -56,8 +58,10 @@ class TodoRepositoryImpl implements TodoRepository {
         final syncedModel = TodoModel(
           hiveId: todo.id,
           hiveTitle: todo.title,
+          hiveDescription: todo.description,
           hiveIsCompleted: todo.isCompleted,
           hiveIsSyncPending: false,
+          hiveCreatedAt: todo.createdAt,
         );
         await localDataSource.updateTodo(syncedModel);
         return Right(syncedModel);
@@ -66,8 +70,10 @@ class TodoRepositoryImpl implements TodoRepository {
         final failedModel = TodoModel(
           hiveId: todo.id,
           hiveTitle: todo.title,
+          hiveDescription: todo.description,
           hiveIsCompleted: todo.isCompleted,
           hiveIsSyncPending: true,
+          hiveCreatedAt: todo.createdAt,
         );
         await localDataSource.updateTodo(failedModel);
         return Right(failedModel);

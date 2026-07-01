@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../profile/presentation/screens/profile_screen.dart';
 import '../../../locations/presentation/screens/locations_screen.dart';
 import '../../../todo/presentation/screens/todo_screen.dart';
@@ -40,6 +41,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
   }
 
+  Widget _buildNavIcon(String assetPath, bool isSelected) {
+    return SvgPicture.asset(
+      assetPath,
+      width: 24,
+      height: 24,
+      colorFilter: ColorFilter.mode(
+        isSelected ? Theme.of(context).primaryColor : Colors.grey,
+        BlendMode.srcIn,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,23 +70,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _currentIndex = index;
           });
         },
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
+            icon: _buildNavIcon('assets/icon/tasks.svg', _currentIndex == 0),
+            activeIcon: _buildNavIcon('assets/icon/tasks.svg', true),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.location_on_outlined),
-            activeIcon: Icon(Icons.location_on),
+            icon: _buildNavIcon('assets/icon/location.svg', _currentIndex == 1),
+            activeIcon: _buildNavIcon('assets/icon/location.svg', true),
             label: 'Locations',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.sync),
+            icon: _buildNavIcon('assets/icon/sync.svg', _currentIndex == 2),
+            activeIcon: _buildNavIcon('assets/icon/sync.svg', true),
             label: 'Sync',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
+            icon: _buildNavIcon('assets/icon/profile.svg', _currentIndex == 3),
+            activeIcon: _buildNavIcon('assets/icon/profile.svg', true),
             label: 'Profile',
           ),
         ],
@@ -81,3 +96,4 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
+

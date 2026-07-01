@@ -17,24 +17,36 @@ class TodoModel extends Todo {
   @HiveField(3)
   final bool hiveIsSyncPending;
 
+  @HiveField(4)
+  final String? hiveDescription;
+
+  @HiveField(5)
+  final String hiveCreatedAt;
+
   const TodoModel({
     required this.hiveId,
     required this.hiveTitle,
     required this.hiveIsCompleted,
     required this.hiveIsSyncPending,
+    this.hiveDescription,
+    required this.hiveCreatedAt,
   }) : super(
           id: hiveId,
           title: hiveTitle,
+          description: hiveDescription,
           isCompleted: hiveIsCompleted,
           isSyncPending: hiveIsSyncPending,
+          createdAt: hiveCreatedAt,
         );
 
   factory TodoModel.fromJson(Map<String, dynamic> json) {
     return TodoModel(
       hiveId: json['id'] ?? json['_id'] ?? '',
       hiveTitle: json['title'] ?? '',
+      hiveDescription: json['description'],
       hiveIsCompleted: json['is_completed'] ?? false,
       hiveIsSyncPending: false, // from API, it's always synced initially
+      hiveCreatedAt: json['created_at'] ?? DateTime.now().toIso8601String(),
     );
   }
 
@@ -42,6 +54,7 @@ class TodoModel extends Todo {
     return {
       'id': hiveId,
       'title': hiveTitle,
+      'description': hiveDescription,
       'is_completed': hiveIsCompleted,
     };
   }
@@ -50,8 +63,11 @@ class TodoModel extends Todo {
     return TodoModel(
       hiveId: entity.id,
       hiveTitle: entity.title,
+      hiveDescription: entity.description,
       hiveIsCompleted: entity.isCompleted,
       hiveIsSyncPending: entity.isSyncPending,
+      hiveCreatedAt: entity.createdAt,
     );
   }
 }
+

@@ -4,6 +4,7 @@ import '../../../../core/errors/failures.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
+import '../models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -13,7 +14,8 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, User>> login(String email, String password) async {
     try {
-      final user = await remoteDataSource.login(email, password);
+      final response = await remoteDataSource.login(email, password);
+      final user = UserModel.fromJson(response['user']);
       return Right(user);
     } on DioException catch (e) {
       return Left(ServerFailure(e.response?.data['message'] ?? 'Login failed'));
@@ -23,9 +25,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, User>> register(String name, String email, String password) async {
+  Future<Either<Failure, User>> register(String fullName, String email, String password) async {
     try {
-      final user = await remoteDataSource.register(name, email, password);
+      final response = await remoteDataSource.register(fullName, email, password);
+      final user = UserModel.fromJson(response['user']);
       return Right(user);
     } on DioException catch (e) {
       return Left(ServerFailure(e.response?.data['message'] ?? 'Registration failed'));

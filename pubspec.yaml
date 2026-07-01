@@ -1,0 +1,86 @@
+name: pgb_app_tasks
+description: A Flutter application for managing PGB tasks with location tracking and offline support.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management & BLoC
+  flutter_bloc: ^9.0.0
+  bloc: ^9.0.0
+
+  # HTTP & Networking
+  dio: ^5.3.0
+  connectivity_plus: ^5.0.0
+
+  # Service Locator & Dependency Injection
+  get_it: ^9.2.1
+
+  # Routing & Navigation
+  go_router: ^17.3.0
+
+  # Local Storage
+  hive: ^2.2.0
+  hive_flutter: ^1.1.0
+  shared_preferences: ^2.2.0
+  flutter_secure_storage: ^10.3.1
+
+  # JSON Serialization
+  json_annotation: ^4.8.0
+
+  # Functional Programming
+  dartz: ^0.10.1
+
+  # Location Services
+  geolocator: ^14.0.3
+  flutter_background_service: ^5.1.0
+
+  # Notifications
+  flutter_local_notifications: ^17.0.0
+
+  # Fonts
+  google_fonts: ^6.0.0
+
+  # Date & Time
+  intl: ^0.20.3
+
+  # Equatable for value comparison
+  equatable: ^2.0.0
+
+  # SVG Support
+  flutter_svg: ^2.3.0
+
+  # Geocoding
+  geocoding: ^3.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  
+  # Code Generation
+  build_runner: ^2.4.0
+  json_serializable: ^6.7.0
+  hive_generator: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icon/
+
+  # Uncomment and add fonts below as needed:
+  # fonts:
+  #   - family: Roboto
+  #     fonts:
+  #       - asset: assets/fonts/Roboto-Regular.ttf
+  #       - asset: assets/fonts/Roboto-Bold.ttf
+  #         weight: 700
