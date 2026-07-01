@@ -2,8 +2,10 @@ import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/network/dio_client.dart';
 import 'core/network/network_info.dart';
+import 'core/theme/theme_cubit.dart';
 
 import 'features/auth/data/datasources/auth_remote_datasource.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
@@ -30,6 +32,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => DioClient(dio: sl(), secureStorage: sl()));
   sl.registerLazySingleton(() => Connectivity());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+  
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+  sl.registerLazySingleton(() => ThemeCubit(prefs: sl()));
 
   // ================= AUTH =================
   sl.registerLazySingleton<AuthRemoteDataSource>(

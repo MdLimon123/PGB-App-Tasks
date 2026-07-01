@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
+import '../../../../core/theme/theme_cubit.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -134,7 +135,9 @@ class ProfileScreen extends StatelessWidget {
                     if (!isDark) _buildDivider(),
                     _buildMenuItem(Icons.notifications_none, 'Notifications', isDark),
                     if (!isDark) _buildDivider(),
-                    _buildMenuItem(Icons.settings_outlined, 'Settings', isDark),
+                    _buildMenuItem(Icons.dark_mode_outlined, 'Theme', isDark, onTap: () {
+                      _showThemeSelector(context);
+                    }),
                     if (!isDark) _buildDivider(),
                     _buildMenuItem(Icons.help_outline, 'Help & support', isDark),
                   ],
@@ -172,9 +175,9 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, bool isDark) {
+  Widget _buildMenuItem(IconData icon, String title, bool isDark, {VoidCallback? onTap}) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap ?? () {},
       borderRadius: BorderRadius.circular(20),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -194,5 +197,60 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildDivider() {
     return Divider(height: 1, indent: 56, endIndent: 20, color: Colors.grey.withOpacity(0.1));
+  }
+
+  void _showThemeSelector(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, currentMode) {
+            final theme = Theme.of(context);
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Select Theme', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      leading: const Icon(Icons.brightness_auto),
+                      title: const Text('System Default'),
+                      trailing: currentMode == ThemeMode.system ? Icon(Icons.check, color: theme.primaryColor) : null,
+                      onTap: () {
+                        context.read<ThemeCubit>().updateThemeMode(ThemeMode.system);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.light_mode),
+                      title: const Text('Light Mode'),
+                      trailing: currentMode == ThemeMode.light ? Icon(Icons.check, color: theme.primaryColor) : null,
+                      onTap: () {
+                        context.read<ThemeCubit>().updateThemeMode(ThemeMode.light);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.dark_mode),
+                      title: const Text('Dark Mode'),
+                      trailing: currentMode == ThemeMode.dark ? Icon(Icons.check, color: theme.primaryColor) : null,
+                      onTap: () {
+                        context.read<ThemeCubit>().updateThemeMode(ThemeMode.dark);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }
